@@ -1,24 +1,121 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>店舗詳細</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{{ shop.name }} - 詳細情報</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  {% if shop %}
-    <h1>{{ shop.name }}</h1>
-    <img src="{{ shop.photo.pc.l }}" alt="shop image" style="max-width:300px;">
-    <p>住所: {{ shop.address }}</p>
-    <p>営業時間: {{ shop.open }}</p>
-    <p>アクセス: {{ shop.access }}</p>
-    <p>ジャンル: {{ shop.genre.name }}</p>
-    <p>URL: <a href="{{ shop.urls.pc }}" target="_blank">{{ shop.urls.pc }}</a></p>
-    <p><a href="/search?lat={{ shop.lat }}&lng={{ shop.lng }}&radius=3">周辺検索へ戻る</a></p>
-  {% else %}
-    <p>店舗情報が取得できませんでした。</p>
-    <p><a href="/">トップへ戻る</a></p>
-  {% endif %}
+<header>
+  <h1>🍴 グルメサーチ</h1>
+</header>
+
+<main class="detail-page">
+
+  <!-- Hero セクション -->
+  <section class="hero-section">
+    {% if shop.photo and shop.photo.pc and shop.photo.pc.l %}
+      <img class="hero-image" src="{{ shop.photo.pc.l }}" alt="{{ shop.name }}の画像">
+    {% endif %}
+    <div class="hero-overlay">
+      <h2 class="shop-name">{{ shop.name }}</h2>
+      <p class="shop-genre">{{ shop.genre.name }} / {{ shop.sub_genre.name if shop.sub_genre else ''}}</p>
+      <!-- 簡易な評価例：実際はAPIに評価情報がない場合、固定表示や別途実装が必要 -->
+      <div class="rating">
+        ★★★★☆ (4.0)
+      </div>
+      <div class="hero-actions">
+        <a href="{{ shop.urls.pc }}" target="_blank" class="btn-primary">公式ページへ</a>
+        <!-- 電話番号がAPIで取得可能であれば -->
+        {% if shop.tel %}
+          <a href="tel:{{ shop.tel }}" class="btn-secondary">電話する</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- 基本情報 -->
+  <section class="shop-info">
+    <h3>基本情報</h3>
+    <ul class="info-list">
+      <li><strong>住所:</strong> {{ shop.address }}</li>
+      <li><strong>アクセス:</strong> {{ shop.access }}</li>
+      <li><strong>最寄駅:</strong> {{ shop.station_name }}</li>
+      <li><strong>営業時間:</strong> {{ shop.open }}</li>
+      {% if shop.close %}
+        <li><strong>定休日:</strong> {{ shop.close }}</li>
+      {% endif %}
+      {% if shop.party_capacity %}
+        <li><strong>宴会最大人数:</strong> {{ shop.party_capacity }}名</li>
+      {% endif %}
+      {% if shop.card %}
+        <li><strong>クレジットカード:</strong> {{ shop.card }}</li>
+      {% endif %}
+      {% if shop.parking %}
+        <li><strong>駐車場:</strong> {{ shop.parking }}</li>
+      {% endif %}
+    </ul>
+  </section>
+
+  <!-- 特徴セクション -->
+  <section class="shop-features">
+    <h3>特徴・サービス</h3>
+    <div class="features-grid">
+      <div class="feature-item">
+        <img src="{{ url_for('static', filename='icons/free_drink.svg') }}" alt="飲み放題アイコン">
+        <p>飲み放題: {{ shop.free_drink }}</p>
+      </div>
+      <div class="feature-item">
+        <img src="{{ url_for('static', filename='icons/free_food.svg') }}" alt="食べ放題アイコン">
+        <p>食べ放題: {{ shop.free_food }}</p>
+      </div>
+      <div class="feature-item">
+        <img src="{{ url_for('static', filename='icons/private_room.svg') }}" alt="個室アイコン">
+        <p>個室あり: {{ shop.private_room }}</p>
+      </div>
+      <div class="feature-item">
+        <img src="{{ url_for('static', filename='icons/wifi.svg') }}" alt="WiFiアイコン">
+        <p>WiFi: {{ shop.wifi }}</p>
+      </div>
+      <div class="feature-item">
+        <img src="{{ url_for('static', filename='icons/lunch.svg') }}" alt="ランチアイコン">
+        <p>ランチ: {{ shop.lunch }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 予算・メニュー -->
+  <section class="shop-menu">
+    <h3>予算とメニュー</h3>
+    <p><strong>ディナー予算:</strong> {{ shop.budget.name }} (平均: {{ shop.budget.average }})</p>
+    {% if shop.budget_memo %}
+      <p><strong>予算備考:</strong> {{ shop.budget_memo }}</p>
+    {% endif %}
+    {% if shop.wedding %}
+      <p><strong>ウエディング/二次会対応:</strong> {{ shop.wedding }}</p>
+    {% endif %}
+    {% if shop.course %}
+      <p><strong>コース:</strong> {{ shop.course }}</p>
+    {% endif %}
+    <p class="menu-note">{{ shop.catch }}</p>
+  </section>
+
+  <!-- 口コミ・レビューへの導線（実際の口コミAPIはないのでリンクのみ）-->
+  <section class="shop-reviews">
+    <h3>口コミ・レビュー</h3>
+    <p>実際の口コミやレビューを参照したい方は以下より:</p>
+    <a href="{{ shop.urls.pc }}" target="_blank" class="btn-tertiary">口コミを見る</a>
+  </section>
+
+  <!-- 戻るリンク -->
+  <div class="back-link">
+    <a href="/search?lat={{ shop.lat }}&lng={{ shop.lng }}&radius=3">← 周辺検索に戻る</a>
+  </div>
+</main>
+
+<footer>
+  <p>Powered by HotPepper API</p>
+</footer>
 </body>
 </html>

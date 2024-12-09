@@ -1,52 +1,69 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HotPepper Gourmet Finder - Search</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>グルメサーチ - 検索</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h1>現在地付近のレストラン検索</h1>
-  <p>「現在地取得」ボタンを押して位置情報を取得してから検索できます。</p>
-  <form action="/search" method="get">
-    <input type="hidden" name="lat" id="lat" value="" />
-    <input type="hidden" name="lng" id="lng" value="" />
-    <label for="radius">検索半径:</label>
-    <select name="radius" id="radius">
-      <option value="1">300m</option>
-      <option value="2">500m</option>
-      <option value="3" selected>1000m</option>
-      <option value="4">2000m</option>
-      <option value="5">3000m</option>
-    </select>
-    <br><br>
-
-    <!-- 追加の検索条件例 -->
-    <label><input type="checkbox" name="wifi" value="1"> WiFiあり</label><br>
-    <label><input type="checkbox" name="private_room" value="1"> 個室あり</label><br>
-    <label><input type="checkbox" name="free_drink" value="1"> 飲み放題あり</label><br>
-
-    <p id="status"></p>
-    <button type="button" onclick="getLocation()">現在地取得</button>
-    <button type="submit">検索</button>
-  </form>
+  <header>
+    <h1>🍴 グルメサーチ</h1>
+  </header>
+  <main class="search-container">
+    <section class="card">
+      <h2>🔍 検索条件を設定</h2>
+      <form action="/search" method="get">
+        <input type="hidden" name="lat" id="lat" value="">
+        <input type="hidden" name="lng" id="lng" value="">
+      
+        <label for="radius">検索範囲:</label>
+        <select name="radius" id="radius" class="input-select">
+          <option value="1">300m</option>
+          <option value="2">500m</option>
+          <option value="3" selected>1000m</option>
+          <option value="4">2000m</option>
+          <option value="5">3000m</option>
+        </select>
+        </div>
+        <div class="form-group">
+          <label for="genre">ジャンル:</label>
+          <input type="text" name="genre" id="genre" placeholder="例: 居酒屋, カフェ" class="input-text">
+        </div>
+        <div class="form-group">
+          <label for="budget">予算:</label>
+          <select name="budget" id="budget" class="input-select">
+            <option value="">指定なし</option>
+            <option value="B001">～1000円</option>
+            <option value="B002">2000～3000円</option>
+            <option value="B003">3000～4000円</option>
+          </select>
+        </div>
+        <p id="status" class="status"></p>
+        <div class="form-actions">
+          <button type="button" onclick="getLocation()">📍 現在地取得</button>
+          <button type="submit" class="btn-primary">検索する</button>
+        </div>
+      </form>
+    </section>
+  </main>
+  <footer>
+    <p>Powered by HotPepper API</p>
+  </footer>
 
   <script>
     function getLocation() {
       const status = document.getElementById('status');
       if (!navigator.geolocation){
-        status.textContent = 'Geolocation はサポートされていません。';
+        status.textContent = 'Geolocationはサポートされていません。';
         return;
       }
       status.textContent = '現在地を取得中...';
 
       navigator.geolocation.getCurrentPosition((position) => {
-        const latInput = document.getElementById('lat');
-        const lngInput = document.getElementById('lng');
-        latInput.value = position.coords.latitude;
-        lngInput.value = position.coords.longitude;
-        status.textContent = '現在地取得完了！このまま検索できます。';
+        document.getElementById('lat').value = position.coords.latitude;
+        document.getElementById('lng').value = position.coords.longitude;
+        status.textContent = '現在地取得完了！';
       }, () => {
         status.textContent = '現在地を取得できませんでした。';
       });
