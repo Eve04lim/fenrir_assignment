@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>検索結果一覧</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>検索結果一覧</h1>
+  <p>ヒット数: {{ total_hit_count }}</p>
+
+  {% if shops %}
+    <ul class="shop-list">
+      {% for shop in shops %}
+        <li class="shop-item">
+          <img src="{{ shop.photo.mobile.s }}" alt="thumbnail">
+          <h2><a href="/detail/{{ shop.id }}">{{ shop.name }}</a></h2>
+          <p>アクセス: {{ shop.access }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      {% if current_page > 1 %}
+        <a href="/search?lat={{ lat }}&lng={{ lng }}&radius={{ radius }}&start={{ (current_page-2)*10+1 }}">前へ</a>
+      {% endif %}
+      <span>ページ {{ current_page }} / {{ total_pages }}</span>
+      {% if current_page < total_pages %}
+        <a href="/search?lat={{ lat }}&lng={{ lng }}&radius={{ radius }}&start={{ current_page*10+1 }}">次へ</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p>該当する店舗がありません。</p>
+  {% endif %}
+
+  <p><a href="/">検索条件に戻る</a></p>
+</body>
+</html>

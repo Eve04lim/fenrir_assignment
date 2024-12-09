@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HotPepper Gourmet Finder - Search</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>現在地付近のレストラン検索</h1>
+  <p>「現在地取得」ボタンを押して位置情報を取得してから検索できます。</p>
+  <form action="/search" method="get">
+    <input type="hidden" name="lat" id="lat" value="" />
+    <input type="hidden" name="lng" id="lng" value="" />
+    <label for="radius">検索半径:</label>
+    <select name="radius" id="radius">
+      <option value="1">300m</option>
+      <option value="2">500m</option>
+      <option value="3" selected>1000m</option>
+      <option value="4">2000m</option>
+      <option value="5">3000m</option>
+    </select>
+    <br><br>
+
+    <!-- 追加の検索条件例 -->
+    <label><input type="checkbox" name="wifi" value="1"> WiFiあり</label><br>
+    <label><input type="checkbox" name="private_room" value="1"> 個室あり</label><br>
+    <label><input type="checkbox" name="free_drink" value="1"> 飲み放題あり</label><br>
+
+    <p id="status"></p>
+    <button type="button" onclick="getLocation()">現在地取得</button>
+    <button type="submit">検索</button>
+  </form>
+
+  <script>
+    function getLocation() {
+      const status = document.getElementById('status');
+      if (!navigator.geolocation){
+        status.textContent = 'Geolocation はサポートされていません。';
+        return;
+      }
+      status.textContent = '現在地を取得中...';
+
+      navigator.geolocation.getCurrentPosition((position) => {
+        const latInput = document.getElementById('lat');
+        const lngInput = document.getElementById('lng');
+        latInput.value = position.coords.latitude;
+        lngInput.value = position.coords.longitude;
+        status.textContent = '現在地取得完了！このまま検索できます。';
+      }, () => {
+        status.textContent = '現在地を取得できませんでした。';
+      });
+    }
+  </script>
+</body>
+</html>

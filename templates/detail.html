@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>店舗詳細</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  {% if shop %}
+    <h1>{{ shop.name }}</h1>
+    <img src="{{ shop.photo.pc.l }}" alt="shop image" style="max-width:300px;">
+    <p>住所: {{ shop.address }}</p>
+    <p>営業時間: {{ shop.open }}</p>
+    <p>アクセス: {{ shop.access }}</p>
+    <p>ジャンル: {{ shop.genre.name }}</p>
+    <p>URL: <a href="{{ shop.urls.pc }}" target="_blank">{{ shop.urls.pc }}</a></p>
+    <p><a href="/search?lat={{ shop.lat }}&lng={{ shop.lng }}&radius=3">周辺検索へ戻る</a></p>
+  {% else %}
+    <p>店舗情報が取得できませんでした。</p>
+    <p><a href="/">トップへ戻る</a></p>
+  {% endif %}
+</body>
+</html>
