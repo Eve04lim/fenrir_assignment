@@ -1,5 +1,14 @@
 API e3f89e8413970e44
 
+開発環境構築手順
+本ソースコードをローカルにクローンまたはダウンロード
+python3 -m venv venvで仮想環境作成
+source venv/bin/activate (Windowsの場合venv\Scripts\activate)
+pip install -r requirements.txt (要requirements.txtの用意。Flask、requests等)
+export FLASK_APP=app.py (Windowsはset FLASK_APP=app.py)
+flask run
+ブラウザでhttp://localhost:5000にアクセス
+
 flask run
 
 http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=e3f89e8413970e44&lat=34.67&lng=135.52&range=5&order=4
