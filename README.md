@@ -12,7 +12,7 @@ HotPepper Gourmet Finder
 - デザイン性を重視し、UI/UXにこだわった店舗詳細ページ
 
 #### こだわったポイント
-飲食店の検索条件を豊富に選択できるようにしました。
+飲食店の検索条件を豊富に選択できるようにしました
 
 ### 該当プロジェクトのリポジトリ URL（GitHub,GitLab など Git ホスティングサービスを利用されている場合）
 https://github.com/Eve04lim/fenrir_assignment.git
