@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 pt-4">
+    <!-- ヘッダー部分 -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold mb-2">お気に入りレストラン</h1>
+        <div class="flex justify-between items-center">
+            <p class="text-gray-600">お気に入りに登録したレストランの一覧です</p>
+            <a href="{{ url_for('main.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2"/>
+                </svg>
+                レストランを探す
+            </a>
+        </div>
+    </div>
+
+    <!-- お気に入り一覧 -->
+    <div id="favoritesList" class="space-y-4">
+        <!-- JavaScriptで動的に内容が挿入されます -->
+    </div>
+
+    <!-- お気に入りが空の場合のメッセージ -->
+    <div id="emptyFavorites" class="hidden">
+        <div class="text-center py-12 bg-white rounded-lg shadow-sm">
+            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="2"/>
+            </svg>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">
+                まだお気に入りがありません
+            </h2>
+            <p class="text-gray-600 mb-6">
+                気になるレストランをお気に入りに追加して、後で簡単にアクセスできます。
+            </p>
+            <a href="{{ url_for('main.index') }}" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
+                レストランを探す
+                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- 並び替えオプション -->
+    <div id="sortOptions" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 transition-transform transform scale-100 hover:scale-105">
+        <select id="sortFavorites" 
+                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+            <option value="date-desc">登録日（新しい順）</option>
+            <option value="date-asc">登録日（古い順）</option>
+            <option value="name-asc">店舗名（あいうえお順）</option>
+            <option value="name-desc">店舗名（あいうえお逆順）</option>
+        </select>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初期表示
+    favoritesManager.updateFavoritesList();
+
+    // 空の状態の表示制御
+    const favoritesList = document.getElementById('favoritesList');
+    const emptyFavorites = document.getElementById('emptyFavorites');
+    const sortOptions = document.getElementById('sortOptions');
+
+    function updateEmptyState() {
+        const favorites = favoritesManager.getAllFavorites();
+        if (favorites.length === 0) {
+            favoritesList.classList.add('hidden');
+            emptyFavorites.classList.remove('hidden');
+            sortOptions.classList.add('hidden');
+        } else {
+            favoritesList.classList.remove('hidden');
+            emptyFavorites.classList.add('hidden');
+            sortOptions.classList.remove('hidden');
+        }
+    }
+
+    // 並び替え機能の設定
+    const sortSelect = document.getElementById('sortFavorites');
+    sortSelect.addEventListener('change', function() {
+        const favorites = favoritesManager.getAllFavorites();
+        
+        switch (this.value) {
+            case 'date-desc':
+                favorites.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+                break;
+            case 'date-asc':
+                favorites.sort((a, b) => new Date(a.savedAt) - new Date(b.savedAt));
+                break;
+            case 'name-asc':
+                favorites.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'name-desc':
+                favorites.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+        }
+
+        // お気に入りリストの再描画
+        renderFavorites(favorites);
+    });
+
+    function renderFavorites(favorites) {
+        favoritesList.innerHTML = favorites.map(shop => `
+            <div class="bg-white shadow rounded-lg overflow-hidden hover-card mb-4 fade-in">
+                <div class="md:flex">
+                    <div class="md:flex-shrink-0">
+                        <img class="h-32 w-full object-cover md:w-48" 
+                             src="${shop.photo}" 
+                             alt="${shop.name}">
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <a href="/restaurant/${shop.id}" 
+                                   class="text-lg font-semibold text-blue-600 hover:text-blue-800">
+                                    ${shop.name}
+                                </a>
+                                <p class="text-sm text-gray-600 mt-1">${shop.access}</p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    登録日: ${new Date(shop.savedAt).toLocaleDateString()}
+                                </p>
+                            </div>
+                            <button class="focus:outline-none transform hover:scale-110 transition-transform favorite-btn"
+                                    data-shop-id="${shop.id}">
+                                <svg class="w-6 h-6 text-red-500 fill-current" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mt-2">
+                            <span class="inline-block bg-blue-100 rounded-full px-3 py-1 text-sm font-semibold text-blue-700 mr-2">
+                                ${shop.genre}
+                            </span>
+                            <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
+                                ${shop.budget}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // お気に入りボタンのイベントリスナーを設定
+        document.querySelectorAll('.favorite-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const shopId = this.dataset.shopId;
+                favoritesManager.toggleFavorite(shopId);
+            });
+        });
+    }
+
+    // 初期状態の更新
+    updateEmptyState();
+
+    // お気に入りの変更を監視
+    const observer = new MutationObserver(updateEmptyState);
+    observer.observe(favoritesList, { childList: true });
+});
+</script>
+{% endblock %}

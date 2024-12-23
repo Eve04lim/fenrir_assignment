@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}グルメ探し{% endblock %}</title>
+    <!-- TailwindCSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- カスタムCSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='js/favorites.js') }}" defer></script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen pt-16"> <!-- Added pt-16 here -->
+    <!-- ナビゲーションバー -->
+    <nav class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <a href="{{ url_for('main.index') }}" class="flex items-center space-x-2 group">
+                    <div class="relative w-8 h-8">
+                        <svg class="w-full h-full text-blue-600 transform group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                        Gourmet Search
+                    </span>
+                </a>
+
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('main.index') }}" class="nav-link">
+                        <span class="flex items-center">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span>Home</span>
+                        </span>
+                    </a>
+                    <a href="{{ url_for('main.favorites') }}" class="nav-link">
+                        <span class="flex items-center">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            <span>Favorites</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-white/80 backdrop-blur-md mt-20">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-600">© 2024 Gourmet Search</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">About</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Terms</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Privacy</a>
+                    <a href="http://webservice.recruit.co.jp/" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                        Powered by ホットペッパー Webサービス
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- スクロールトップボタン -->
+    <button id="scrollTopBtn" 
+            class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 hover:bg-blue-700 focus:outline-none"
+            onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+
+    <!-- 共通JavaScript -->
+    <script>
+        // AOSの初期化
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out',
+            once: true
+        });
+
+        // ナビゲーションバーのスクロール制御
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            // スクロールトップボタンの表示制御
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (currentScroll > 400) {
+                scrollBtn.classList.remove('translate-y-20', 'opacity-0');
+            } else {
+                scrollBtn.classList.add('translate-y-20', 'opacity-0');
+            }
+
+            // ナビゲーションバーの表示制御
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                navbar.classList.add('-translate-y-full');
+            } else {
+                navbar.classList.remove('-translate-y-full');
+            }
+
+            lastScroll = currentScroll;
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

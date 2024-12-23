@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 pt-4">
+    <!-- 戻るボタン -->
+    <div class="mb-4">
+        <button class="inline-flex items-center text-blue-600 hover:text-blue-800 back-button">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2"/>
+            </svg>
+            検索結果に戻る
+        </button>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- ヘッダー画像とお気に入りボタン -->
+        <div class="relative h-96">
+            <img src="{{ restaurant.photo.pc.l }}" 
+                 alt="{{ restaurant.name }}"
+                 class="w-full h-full object-cover">
+            
+            <!-- お気に入りボタン -->
+            <button class="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 focus:outline-none favorite-btn"
+                    data-favorite-id="{{ restaurant.id }}"
+                    data-restaurant='{{ restaurant|tojson|safe }}'>
+                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="2"/>
+                </svg>
+            </button>
+            
+            <!-- ジャンル表示 -->
+            {% if restaurant.genre %}
+            <div class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
+                {{ restaurant.genre.name }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 店舗情報 -->
+        <div class="p-6">
+            <!-- 店舗名とアクセス -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold mb-2">{{ restaurant.name }}</h1>
+                <p class="text-gray-600">
+                    <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold mr-2">
+                        アクセス
+                    </span>
+                    {{ restaurant.access }}
+                </p>
+            </div>
+
+            <!-- 基本情報 -->
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- 左カラム -->
+                <div class="space-y-4">
+                    <!-- 予算 -->
+                    {% if restaurant.budget %}
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2">予算</h2>
+                        <p class="text-gray-600">{{ restaurant.budget.name }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- 営業時間 -->
+                    {% if restaurant.open %}
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2">営業時間</h2>
+                        <p class="text-gray-600 whitespace-pre-line">{{ restaurant.open }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- 定休日 -->
+                    {% if restaurant.close %}
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2">定休日</h2>
+                        <p class="text-gray-600">{{ restaurant.close }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- 右カラム -->
+                <div class="space-y-4">
+                    <!-- 住所 -->
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2">住所</h2>
+                        <p class="text-gray-600">
+                            〒{{ restaurant.address }}
+                            {% if restaurant.station_name %}
+                            <br>
+                            <span class="text-sm">最寄り駅: {{ restaurant.station_name }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- 電話番号 -->
+                    {% if restaurant.tel %}
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2">電話番号</h2>
+                        <p class="text-gray-600">
+                            <a href="tel:{{ restaurant.tel }}" 
+                               class="text-blue-600 hover:text-blue-800">
+                                {{ restaurant.tel }}
+                            </a>
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- その他の設備・サービス -->
+                    <div>
+                        <h2 class="text-lg font-semibold mb-2">設備・サービス</h2>
+                        <div class="flex flex-wrap gap-2">
+                            {% if restaurant.card != '利用不可' %}
+                            <span class="inline-block bg-green-100 rounded-full px-3 py-1 text-sm font-semibold text-green-700">
+                                カード利用可
+                            </span>
+                            {% endif %}
+
+                            {% if restaurant.private_room == 'あり' %}
+                            <span class="inline-block bg-blue-100 rounded-full px-3 py-1 text-sm font-semibold text-blue-700">
+                                個室あり
+                            </span>
+                            {% endif %}
+
+                            {% if restaurant.wifi == 'あり' %}
+                            <span class="inline-block bg-purple-100 rounded-full px-3 py-1 text-sm font-semibold text-purple-700">
+                                Wi-Fiあり
+                            </span>
+                            {% endif %}
+
+                            {% if restaurant.parking != 'なし' %}
+                            <span class="inline-block bg-yellow-100 rounded-full px-3 py-1 text-sm font-semibold text-yellow-700">
+                                駐車場あり
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 店舗PR -->
+            {% if restaurant.catch or restaurant.description %}
+            <div class="border-t pt-6">
+                {% if restaurant.catch %}
+                <p class="text-xl font-semibold mb-2">{{ restaurant.catch }}</p>
+                {% endif %}
+                {% if restaurant.description %}
+                <p class="text-gray-600">{{ restaurant.description }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- 予約ボタン -->
+            {% if restaurant.urls %}
+            <div class="mt-8 text-center">
+                <a href="{{ restaurant.urls.pc }}" 
+                   target="_blank"
+                   class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full inline-flex items-center external-link">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2"/>
+                    </svg>
+                    ホットペッパーで予約する
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 戻るボタンの処理
+    document.querySelector('.back-button').addEventListener('click', function() {
+        history.back();
+    });
+
+    // 外部リンクの処理
+    document.querySelectorAll('.external-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open(this.href, '_blank');
+        });
+    });
+
+    // お気に入りボタンの処理
+    const favoriteBtn = document.querySelector('.favorite-btn');
+    if (favoriteBtn) {
+        const restaurantData = JSON.parse(favoriteBtn.dataset.restaurant);
+        const restaurantId = favoriteBtn.dataset.favoriteId;
+
+        favoriteBtn.addEventListener('click', function() {
+            if (favoritesManager) {
+                favoritesManager.toggleFavorite(restaurantId, restaurantData);
+            }
+        });
+
+        // 初期状態の設定
+        if (favoritesManager && favoritesManager.isFavorite(restaurantId)) {
+            const icon = favoriteBtn.querySelector('svg');
+            icon.classList.remove('text-gray-400');
+            icon.classList.add('text-red-500', 'fill-current');
+        }
+    }
+});
+</script>
+{% endblock %}
